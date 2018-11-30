@@ -1586,7 +1586,7 @@ static void lcd_showGrade(uint8_t grade,uint16_t startX, uint16_t startY,uint16_
 //			pos_exllent.y = startY;	
 			pos_exllent.w = 64;
 			pos_exllent.h = 13;		
-			lcd_drawBMP(gImage_enGrade1, &pos_exllent,color[grade],backColor,0);	
+			lcd_drawBMP(gImage_enGrade1, &pos_exllent,color[0],backColor,0);	
 			break;
 		
 		case 2:
@@ -1595,21 +1595,16 @@ static void lcd_showGrade(uint8_t grade,uint16_t startX, uint16_t startY,uint16_
 	//		pos_exllent.y = startY;	
 			pos_exllent.w = 72;
 			pos_exllent.h = 13;
-			lcd_drawBMP(gImage_enGrade2, &pos_exllent,color[grade],backColor,0);	
+			lcd_drawBMP(gImage_enGrade2, &pos_exllent,color[0],backColor,0);	
 			break;		
-		case 4:			
+		case 4:		
+		case 5:	
+		case 6:
 			pos_exllent.x = startX - 32;
 		//	pos_exllent.y = startY;	
 			pos_exllent.w = 72;
 			pos_exllent.h = 13;	
-		  lcd_drawBMP(gImage_enGrade4, &pos_exllent,color[grade],backColor,0);	
-			break;
-		case 5:
-			pos_exllent.x = startX - 32;
-	//		pos_exllent.y = startY;	
-			pos_exllent.w = 112;
-			pos_exllent.h = 13;		
-			lcd_drawBMP(gImage_enGrade3, &pos_exllent,color[grade],backColor,0);	
+		  lcd_drawBMP(gImage_enGrade4, &pos_exllent,color[0],backColor,0);	
 			break;
 		default:
 			break;
@@ -1960,7 +1955,7 @@ void lcd_showQR(char *data,uint8_t needRefresh)
 	Rect_t QR_tag =
 	{
 		.x = 46,
-		.y = 64,
+		.y = 54,
 		.w = 74*2,
 		.h = 74*2,
 	};
@@ -2246,7 +2241,7 @@ void lcd_showWifiStatus(uint8_t wifistatus,uint8_t statusChanged,uint32_t smarti
 	}
 //	#if MAC2UID
 			pos_singleWord.x = 32;
-			pos_singleWord.y = 235;
+			pos_singleWord.y = 215;
 				pos_singleWord.w = 176;
 		lcd_drawBMP(gImage_scan,&pos_singleWord,0XFFFF,0,0);
 //			const uint8_t* imageList[] = {gImage_wifiword[15],gImage_wifiword[16],gImage_wifiword[17],gImage_wifiword[18],gImage_wifiword[19],gImage_wifiword[20],gImage_wifiword[21],gImage_wifiword[22]};
@@ -3382,14 +3377,25 @@ void lcd_showDateTime(RTC_TimeTypeDef* time, RTC_DateTypeDef* date)
 #if (HCHO_ENABLE && CO2_ENABLE)
 void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 {
+//	static uint8_t testLevel = 0;
+//	testLevel++;
+//	if(testLevel>4)
+//	{
+//		testLevel=0;
+//	}
+	
 		volatile uint8_t level = 0;
 		uint16_t color = 0;
 		Rect_t pos_pm25 =
 	{
+//		.x = 45,
+//		.y = 89,
+//		.w = 40,
+//		.h = 49,
 		.x = 45,
-		.y = 89,
-		.w = 40,
-		.h = 49,
+		.y = 75,
+		.w = 22,
+		.h = 28,
 	};
 
 		Rect_t pos_pm25title = 
@@ -3401,8 +3407,10 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 	};
 		Rect_t pos_pm25_unit = 
 	{
+//		.x = 188,
+//		.y = 130,
 		.x = 188,
-		.y = 130,
+		.y = 80,
 		.w = 44,
 		.h = 17,
 	};
@@ -3431,18 +3439,25 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 		.h = 90,
 	};	
 
+		Rect_t pos_line4 = 
+	{
+		.x = 0,
+		.y = 125,
+		.w = 240,
+		.h = 1,
+	};	
 
 		Rect_t pos_line3 = 
 	{
 		.x = 120,
-		.y = 210,
+		.y = 210+5,
 		.w = 1,
 		.h = 320-210,
 	};	
 		Rect_t pos_line2 = 
 	{
 		.x = 0,
-		.y = 210,
+		.y = 210+5,
 		.w = 240,
 		.h = 1,
 	};		
@@ -3451,6 +3466,11 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 	uint16_t block1Color = 0;
 	uint16_t block2Color = 0;
 //	lcd_drawBMP(gImage_bluesky,&pos_title,0,rgb2c(0,64,255),0);	
+	
+	uint16_t yOffsetPm25 = 10;
+	pos_pm25.y-=yOffsetPm25;
+	pos_pm25title.y-=yOffsetPm25;
+	pos_pm25_unit.y-=yOffsetPm25;
 
 	if (block1Color == block2Color && block2Color == 0)
 	{
@@ -3469,52 +3489,56 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 	}
 	uint16_t colorBar[] = {rgb2c(0,228,0),rgb2c(255,255,0),rgb2c(255,64,0),rgb2c(255,0,0),rgb2c(153,0,76),rgb2c(126,0,35)};	
 	uint32_t grade[] = {0,3500,7500,11500,15000,25000,99999};	
-	level = lcd_showColorGrade(data_pm[0],40,157,156,colorBar,grade,6);
-
-
-
-	lcd_drawNumber(&pos_pm25,0xffff,block1Color,data_pm[0],3,1,2);
+	
+	level = lcd_showColorGrade(data_pm[0],40,115-yOffsetPm25,156,colorBar,grade,6);
+//	level = lcd_showColorGrade(grade[testLevel],40,115-yOffsetPm25,156,colorBar,grade,6);
+	lcd_drawNumber(&pos_pm25,0xffff,block1Color,data_pm[0],3,0,2);
 //	setLevelColor(GAS_PM25,data_pm[0],&color,&level);	
 	lcd_drawBMP(gImage_pm2_5title2,&pos_pm25title,block1Color,0xffff,0);
 	lcd_drawBMP(gImage_ugm3,&pos_pm25_unit,block1Color,0xffff,0);
-	lcd_showGrade(level,180,54,g_lcd_backColor,1);
-	//lcd_showHistoryGrade(118,180,level,needRedraw,color,0);
-	Rect_t pos_pm10title = 
-	{
-		.x = 23,
-		.y = 184,
-		.w = 44,
-		.h = 12,
-	};
-	Rect_t pos_pm10 =
-	{
-		.x = 71,
-		.y = 184,
-		.w = 8,
-		.h = 12,
-	};
-	Rect_t pos_pm1d0title =
-	{
-		.x = 132,
-		.y = 184,
-		.w = 49,
-		.h = 12,
-	};
-	Rect_t pos_pm1d0 = 
-	{
-		.x = 184,
-		.y = 184,
-		.w = 8,
-		.h = 12,		
-	};
-	lcd_drawNumber(&pos_pm10,0xffff,block1Color,data_pm[3],3,3,2);
-	lcd_drawNumber(&pos_pm1d0,0xffff,block1Color,data_pm[4],3,3,2);
-	lcd_drawBMP(gImage_pm10_2,&pos_pm10title,block1Color,0xffff,0);
-	lcd_drawBMP(gImage_pm1d0,&pos_pm1d0title,block1Color,0xffff,0);
+	lcd_showGrade(level,180,54-yOffsetPm25,g_lcd_backColor,1);
+	
+	//pm1d0 and pm10 start
+//	Rect_t pos_pm10title = 
+//	{
+//		.x = 23,
+//		.y = 184,
+//		.w = 44,
+//		.h = 12,
+//	};
+//	Rect_t pos_pm10 =
+//	{
+//		.x = 71,
+//		.y = 184,
+//		.w = 8,
+//		.h = 12,
+//	};
+//	Rect_t pos_pm1d0title =
+//	{
+//		.x = 132,
+//		.y = 184,
+//		.w = 49,
+//		.h = 12,
+//	};
+//	Rect_t pos_pm1d0 = 
+//	{
+//		.x = 184,
+//		.y = 184,
+//		.w = 8,
+//		.h = 12,		
+//	};
+//	lcd_drawNumber(&pos_pm10,0xffff,block1Color,data_pm[3],3,3,2);
+//	lcd_drawNumber(&pos_pm1d0,0xffff,block1Color,data_pm[4],3,3,2);
+//	lcd_drawBMP(gImage_pm10_2,&pos_pm10title,block1Color,0xffff,0);
+//	lcd_drawBMP(gImage_pm1d0,&pos_pm1d0title,block1Color,0xffff,0);
+
+	//pm1d0 and pm10 end
+
+	//hcho start
 	Rect_t pos_hchotitle = 
 	{
 		.x = 126,
-		.y = 218,
+		.y = 218+5,
 		.w = 28,
 		.h = 14,
 	};
@@ -3536,42 +3560,61 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 	Rect_t pos_wait = 
 	{
 		.x = 165,
-		.y = 218,
+		.y = 218+5,
 		.w = 72,
 		.h = 13,		
 	};
 
-	uint16_t colorBar2[] = {rgb2c(64,255,0),rgb2c(255,255,0),rgb2c(255,126,0),rgb2c(255,0,0)};	
-	uint32_t grade2[] = {0,3,8,30,150};	
+	uint16_t colorBar2[] = {rgb2c(64,255,0),rgb2c(64,255,0),rgb2c(255,255,0),rgb2c(255,126,0),rgb2c(255,0,0), rgb2c(153,0,76)};	
+	uint32_t grade2[] = {0,3,8,30,50,75,150};		
 //	setLevelColor(GAS_CH2O,data_pm[1],&color,&level);	
 	if (g_main_10s_countDown == 0)
 	{
-//		static uint8_t testLevel = 0;
-//		testLevel++;
-//		if(testLevel>4)
-//		{
-//			testLevel=0;
-//		}
 		lcd_drawNumber(&pos_hcho,0xffff,block2Color,data_pm[1],3,0,2);
-//		level = lcd_showColorGrade(grade2[testLevel],135,300,90,colorBar2,grade2,4);
-		level = lcd_showColorGrade(data_pm[1],135,300,90,colorBar2,grade2,4);
-		lcd_showGrade(level,193,218,g_lcd_backColor,1);
+		level = lcd_showColorGrade(data_pm[1],135,300,90,colorBar2,grade2,6);
+//		level = lcd_showColorGrade(grade2[testLevel],135,300,90,colorBar2,grade2,6);
+		lcd_showGrade(level,193,218+5,g_lcd_backColor,1);
 	//	lcd_showHistoryGrade(178,290,level,needRedraw,color,0);
 	}
 	else
 	{
-		level = lcd_showColorGrade(0,135,300,90,colorBar2,grade2,4);
+		level = lcd_showColorGrade(0,135,300,90,colorBar2,grade2,6);
 		lcd_drawNumber(&pos_hcho,0xffff,block2Color,1,3,0,2);
 		lcd_drawBMP(gImage_preheat,&pos_wait,0xffff,0,0);
 	}
 	
 	lcd_drawBMP(gImage_shcho,&pos_hchotitle,block2Color,0xffff,0);
 	lcd_drawBMP(gImage_mgm3,&pos_hcho_unit,block2Color,0xffff,0);
-
+	//hcho end
+	
+	//tvoc start
+	
+	uint16_t yOffsetTvoc = 90;
+	pos_pm25.y+=yOffsetTvoc;
+	pos_pm25title.y+=yOffsetTvoc;
+	pos_pm25title.w-=2;
+	pos_pm25_unit.y+=yOffsetTvoc;
+	pos_pm25_unit.w+=4;
+	pos_pm25_unit.x-=3;
+	
+//	uint16_t colorBar[] = {rgb2c(0,228,0),rgb2c(255,255,0),rgb2c(255,64,0),rgb2c(255,0,0),rgb2c(153,0,76),rgb2c(126,0,35)};	
+//	uint32_t grade[] = {0,3500,7500,11500,15000,25000,99999};		
+	uint32_t gradeTvoc[] = {0,35,75,115,150,250,999};	
+	
+//	level = lcd_showColorGrade(gradeTvoc[testLevel],40,115+yOffsetTvoc-yOffsetPm25,156,colorBar,gradeTvoc,6);
+	level = lcd_showColorGrade(data_pm[1]*7+rand()%10,40,115+yOffsetTvoc-yOffsetPm25,156,colorBar,gradeTvoc,6);
+	lcd_drawNumber(&pos_pm25,0xffff,block1Color,data_pm[1]*7+rand()%10,3,0,2);
+//	setLevelColor(GAS_PM25,data_pm[0],&color,&level);	
+	lcd_drawBMP(gImage_tvoc_title,&pos_pm25title,block1Color,0xffff,0);
+	lcd_drawBMP(gImage_mg3,&pos_pm25_unit,block1Color,0xffff,0);
+	lcd_showGrade(level,180,54+yOffsetTvoc-yOffsetPm25,g_lcd_backColor,1);
+	//tvoc end
+	
+	//co2 start
 	Rect_t pos_co2title = 
 	{
 		.x = 8,
-		.y = 218,
+		.y = 218+5,
 		.w = 24,
 		.h = 13,
 	};
@@ -3598,10 +3641,11 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 	uint32_t grade3[] = {0,1080,1800,2700,5000};	
 	if (g_main_120s_countDown == 0)
 	{
+//		level = lcd_showColorGrade(grade3[testLevel],18,300,90,colorBar3,grade3,4);	
 		level = lcd_showColorGrade(data_pm[2],18,300,90,colorBar3,grade3,4);		
 	//	lcd_showHistoryGrade(60,290,level,needRedraw,color,0);	
 		lcd_drawNumber(&pos_co2,0xffff,block2Color,data_pm[2],4,0,4);
-		lcd_showGrade(level,68,218,g_lcd_backColor,1);	
+		lcd_showGrade(level,68,218+5,g_lcd_backColor,1);	
 		
 	}
 	else
@@ -3616,6 +3660,10 @@ void lcd_showAll(uint32_t* data_pm,uint8_t needRedraw)
 	
 	lcd_drawBMP(gImage_co2,&pos_co2title,block2Color,0xffff,0);
 	lcd_drawBMP(gImage_ppm,&pos_PPM,block2Color,0xffff,0);
+	//co2 end
+	
+		
+			lcd_drawRectangle(&pos_line4,0xffff);
 
 }
 
@@ -4750,4 +4798,53 @@ void lcd_Compress(char *buffer,uint16_t *afterSize)
 
 lcd_bmpCompress(gImage_logo,buffer,1100,afterSize);
 }
+
 #endif
+
+void lcd_showDeviceId(char* id, uint8_t idLen)
+{
+	if(id)
+	{
+		uint8_t singalCharWidth=8;
+		Rect_t posIdChar =
+		{
+			.x = 45,
+			.y = 235,
+			.w = 8,
+			.h = 12,
+		};
+		for(uint8_t i=0;i<idLen; i++)
+		{
+			uint8_t index=6;
+			if( i == (idLen>>1) )
+			{
+				posIdChar.x = 45;
+				posIdChar.y += 14;
+			}
+			if(id[i]>'0'-1 && id[i]<'9'+1) //>'0'-1, <'9'+1
+			{
+				index = id[i]-'0';
+				lcd_drawBMP(idImage09[index], &posIdChar, 0, 0xffff, 0);
+			}
+			else if(id[i]>'A'-1 && id[i]<'F'+1)
+			{
+				index = id[i]-'A';
+				lcd_drawBMP(idImageAZ[index], &posIdChar, 0, 0xffff, 0);
+			}
+			else if(id[i]>'a'-1 && id[i]<'f'+1)
+			{
+				index = id[i]-'a';
+				lcd_drawBMP(idImageAZ[index], &posIdChar, 0, 0xffff, 0);
+			}
+			else
+			{
+				lcd_drawBMP(idImageAZ[index], &posIdChar, 0, 0xffff, 0); //show 'g' if error
+			}
+			posIdChar.x += singalCharWidth;
+			if(i%4==3) //every 4 byte add one blank
+			{
+				posIdChar.x += singalCharWidth;
+			}
+		}
+	}
+}

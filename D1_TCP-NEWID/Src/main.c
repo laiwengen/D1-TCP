@@ -937,7 +937,7 @@ char* uidEncyption(char* uid,uint16_t len,char* deviceType)
 		}
 		for (i = 0; i < len;i ++)
 		{
-			sprintf(uid2ASCii +  headerLength + 1 + (i<<1),"%02X",*(uidAfterEncyption + i));
+			sprintf(uid2ASCii +  headerLength + 1 + (i<<1),"%02x",*(uidAfterEncyption + i));
 		}		
 		for (i = 0; i < headerLength ; i ++)
 		{
@@ -1053,7 +1053,7 @@ void lcd_update(void)
 			lcd_showWifiStatus(g_main_wifi_status,needRedraw,smartTick);
 			lcd_showInfoHeader(g_main_wifi_status,g_main_battery,g_main_is_charging,&g_main_time,&g_main_date);
 		//	lcd_showTest(fmin(2000,wifistatus),0xffff);
-
+			lcd_showDeviceId(g_main_uploadId+3,32);
 			break;	
 		}
 //		case STATUS_ALL_SHOW:
@@ -2416,12 +2416,12 @@ int main(void)
 		sprintf(g_main_uploadId,"%s-",DEVICE_VERSION); 
 		for (uint8_t i = 0; i < 16;i ++)
 		{
-			sprintf(g_main_uploadId + strlen(g_main_uploadId),"%02X",idBuffer[i]);
+			sprintf(g_main_uploadId + strlen(g_main_uploadId),"%02x",idBuffer[i]);//change uppercase to lowercase
 		}
 		#endif
 	}
 #endif
-//	 g_main_status = STATUS_ALL_SHOW;
+//	 g_main_status = STATUS_WIFI;
 	/* USER CODE END 2 */
 
   /* USER CODE BEGIN 3 */

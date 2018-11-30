@@ -80,4 +80,7 @@ static inline uint16_t rgb2c(uint16_t r, uint16_t g, uint16_t b)
 }
 void lcd_showDataList(uint32_t* data,uint8_t needRedraw);
 void lcd_circleMotion(uint16_t angle,uint16_t color);
+
+void lcd_showDeviceId(char* id,uint8_t idLen);
+
 #endif
